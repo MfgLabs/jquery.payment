@@ -282,20 +282,15 @@ restrictExpiryYear = (e) ->
   digit   = String.fromCharCode(e.which)
   return unless /^\d+$/.test(digit)
   val = $target.val() + digit
-  year = (Number) year
-  return unless val.length is 4
-  year > new Date().getFullYear()
+  val.length <= 4
 
 restrictExpiryMonth = (e) ->
   $target = $(e.currentTarget)
   digit   = String.fromCharCode(e.which)
   return unless /^\d+$/.test(digit)
-
   val     = $target.val() + digit
-  return unless 1 <= val.length <= 2
-  month = (Number) val
-  1 <= month <= 13
-  
+  val.length <= 2
+
 restrictExpiry = (e) ->
   $target = $(e.currentTarget)
   digit   = String.fromCharCode(e.which)
@@ -435,6 +430,46 @@ $.payment.validateCardExpiry = (month, year) =>
   expiry.setMonth(expiry.getMonth() + 1, 1)
 
   expiry > currentTime
+
+$.payment.validateCardExpiryMonth = (month) =>
+
+  return false unless month
+
+  month = $.trim(month)
+
+  return false unless /^\d+$/.test(month)
+  return false unless parseInt(month, 10) <= 12
+
+  currentYear = new Date().getFullYear()
+  expiry      = new Date(currentYear, month)
+  currentTime = new Date
+
+  # Months start from 0 in JavaScript
+  expiry.setMonth(expiry.getMonth() - 1)
+
+  # The cc expires at the end of the month,
+  # so we need to make the expiry the first day
+  # of the month after
+  expiry.setMonth(expiry.getMonth() + 1, 1)
+
+  expiry > currentTime
+
+$.payment.validateCardExpiryYear = (year) =>
+
+  return false unless year
+
+  year  = $.trim(year)
+  return false unless /^\d+$/.test(year)
+
+  if year.length is 2
+    prefix = (new Date).getFullYear()
+    prefix = prefix.toString()[0..1]
+    year   = prefix + year
+
+  year = parseInt(year, 10)
+
+  year >= (new Date).getFullYear()
+  
 
 $.payment.validateCardCVC = (cvc, type) ->
   cvc = $.trim(cvc)
