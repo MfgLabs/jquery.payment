@@ -277,6 +277,25 @@ restrictCardNumber = (e) ->
     # All other cards are 16 digits long
     value.length <= 16
 
+restrictExpiryYear = (e) ->
+  $target = $(e.currentTarget)
+  digit   = String.fromCharCode(e.which)
+  return unless /^\d+$/.test(digit)
+  val = $target.val() + digit
+  year = (Number) year
+  return unless val.length is 4
+  year > new Date().getFullYear()
+
+restrictExpiryMonth = (e) ->
+  $target = $(e.currentTarget)
+  digit   = String.fromCharCode(e.which)
+  return unless /^\d+$/.test(digit)
+
+  val     = $target.val() + digit
+  return unless 1 <= val.length <= 2
+  month = (Number) val
+  1 <= month <= 13
+  
 restrictExpiry = (e) ->
   $target = $(e.currentTarget)
   digit   = String.fromCharCode(e.which)
@@ -337,6 +356,16 @@ $.payment.fn.formatCardNumber = ->
   @on('keydown', formatBackCardNumber)
   @on('keyup', setCardType)
   @on('paste', reFormatCardNumber)
+  this
+
+$.payment.fn.formatExpiryMonth = ->
+  @payment('restrictNumeric')
+  @on('keypress', restrictExpiryMonth)
+  this
+
+$.payment.fn.formatExpiryYear = ->
+  @payment('restrictNumeric')
+  @on('keypress', restrictExpiryYear)
   this
 
 # Restrictions
