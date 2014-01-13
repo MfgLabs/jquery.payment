@@ -1,0 +1,9 @@
+{
+    "name": "wdmtg-validation",
+    "title": "wdmtg-validation",
+    "description": "A general purpose library for building credit card forms, validating inputs and formatting numbers.",
+    "version": "0.0.0",
+    "dependencies": {
+        "jquery": ">=1.5"
+    }
+}

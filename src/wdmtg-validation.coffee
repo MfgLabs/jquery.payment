@@ -1,8 +1,8 @@
 $            = jQuery
-$.payment    = {}
-$.payment.fn = {}
-$.fn.payment = (method, args...) ->
-  $.payment.fn[method].apply(this, args)
+$.validation    = {}
+$.validation.fn = {}
+$.fn.validation = (method, args...) ->
+  $.validation.fn[method].apply(this, args)
 
 # Utils
 
@@ -122,7 +122,7 @@ reFormatCardNumber = (e) ->
   setTimeout =>
     $target = $(e.currentTarget)
     value   = $target.val()
-    value   = $.payment.formatCardNumber(value)
+    value   = $.validation.formatCardNumber(value)
     $target.val(value)
 
 formatCardNumber = (e) ->
@@ -240,8 +240,74 @@ formatBackExpiry = (e) ->
     e.preventDefault()
     $target.val(value.replace(/\s\/\s?\d?$/, ''))
 
+
+formatEmail = (e) ->
+  # Only format if input is a number
+  digit = String.fromCharCode(e.which)
+  return unless /^\d+$/.test(digit)
+
+  $target = $(e.currentTarget)
+  val     = $target.val() + digit
+
+  if /^\d$/.test(val) and val not in ['0', '1']
+    e.preventDefault()
+    $target.val("0#{val} @ ")
+
+  else if /^\d\d$/.test(val)
+    e.preventDefault()
+    $target.val("#{val} @ ")
+
+formatEmailForward = (e) ->
+  digit = String.fromCharCode(e.which)
+  return unless /^\d+$/.test(digit)
+
+  $target = $(e.currentTarget)
+  val     = $target.val()
+
+  if /^\d\d$/.test(val)
+    $target.val("#{val} @ ")
+
+formatEmailForwardAt = (e) ->
+  slash = String.fromCharCode(e.which)
+  return unless slash is '@'
+
+  $target = $(e.currentTarget)
+  val     = $target.val()
+
+  if /^\d$/.test(val) and val isnt '0'
+    $target.val("0#{val} @ ")
+
+formatEmailBack = (e) ->
+  # If shift+backspace is pressed
+  return if e.meta
+
+  $target = $(e.currentTarget)
+  value   = $target.val()
+
+  # Return unless backspacing
+  return unless e.which is 8
+
+  # Return if focus isn't at the end of the text
+  return if $target.prop('selectionStart')? and
+    $target.prop('selectionStart') isnt value.length
+
+  # Remove the trailing space
+  if /\d(\s|@)+$/.test(value)
+    e.preventDefault()
+    $target.val(value.replace(/\d(\s|@)*$/, ''))
+  else if /\s@\s?\d?$/.test(value)
+    e.preventDefault()
+    $target.val(value.replace(/\s@\s?\d?$/, ''))
+
 #  Restrictions
 
+restrictEmail = (e) ->
+  $target = $(e.currentTarget)
+  return if hasTextSelected($target)
+  value = $target.val()
+  return false if value.length > 254 # http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+
+restri
 restrictNumeric = (e) ->
   # Key event is for a browser shortcut
   return true if e.metaKey or e.ctrlKey
@@ -314,7 +380,7 @@ restrictCVC = (e) ->
 setCardType = (e) ->
   $target  = $(e.currentTarget)
   val      = $target.val()
-  cardType = $.payment.cardType(val) or 'unknown'
+  cardType = $.validation.cardType(val) or 'unknown'
 
   unless $target.hasClass(cardType)
     allTypes = (card.type for card in cards)
@@ -330,12 +396,25 @@ setCardType = (e) ->
 
 # Formatting
 
-$.payment.fn.formatCardCVC = ->
+$.validation.fn.formatEmail = ->
+
+  @on 'focus', ->
+    $(@).parent().removeClass("error")
+  
+  @on 'blur', ->
+    if $.validation.validateEmail(@value)
+      $(@).parent().removeClass("error");
+    else
+      $(@).parent().addClass("error");
+
+  this
+
+$.validation.fn.formatCardCVC = ->
   @payment('restrictNumeric')
   @on('keypress', restrictCVC)
   this
 
-$.payment.fn.formatCardExpiry = ->
+$.validation.fn.formatCardExpiry = ->
   @payment('restrictNumeric')
   @on('keypress', restrictExpiry)
   @on('keypress', formatExpiry)
@@ -344,7 +423,7 @@ $.payment.fn.formatCardExpiry = ->
   @on('keydown',  formatBackExpiry)
   this
 
-$.payment.fn.formatCardNumber = ->
+$.validation.fn.formatCardNumber = ->
   @payment('restrictNumeric')
   @on('keypress', restrictCardNumber)
   @on('keypress', formatCardNumber)
@@ -353,28 +432,29 @@ $.payment.fn.formatCardNumber = ->
   @on('paste', reFormatCardNumber)
   this
 
-$.payment.fn.formatExpiryMonth = ->
+$.validation.fn.formatExpiryMonth = ->
   @payment('restrictNumeric')
   @on('keypress', restrictExpiryMonth)
   this
 
-$.payment.fn.formatExpiryYear = ->
+$.validation.fn.formatExpiryYear = ->
   @payment('restrictNumeric')
   @on('keypress', restrictExpiryYear)
   this
 
+
 # Restrictions
 
-$.payment.fn.restrictNumeric = ->
+$.validation.fn.restrictNumeric = ->
   @on('keypress', restrictNumeric)
   this
 
 # Validations
 
-$.payment.fn.cardExpiryVal = ->
-  $.payment.cardExpiryVal($(this).val())
+$.validation.fn.cardExpiryVal = ->
+  $.validation.cardExpiryVal($(this).val())
 
-$.payment.cardExpiryVal = (value) ->
+$.validation.cardExpiryVal = (value) ->
   value = value.replace(/\s/g, '')
   [month, year] = value.split('/', 2)
 
@@ -389,7 +469,7 @@ $.payment.cardExpiryVal = (value) ->
 
   month: month, year: year
 
-$.payment.validateCardNumber = (num) ->
+$.validation.validateCardNumber = (num) ->
   num = (num + '').replace(/\s+|-/g, '')
   return false unless /^\d+$/.test(num)
 
@@ -399,7 +479,17 @@ $.payment.validateCardNumber = (num) ->
   num.length in card.length and
     (card.luhn is false or luhnCheck(num))
 
-$.payment.validateCardExpiry = (month, year) =>
+$.validation.validateEmail = (email) =>
+
+  return false unless email
+
+  email = $.trim(email)
+  filter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+ 
+  (Boolean) filter.test(email)
+
+
+$.validation.validateCardExpiry = (month, year) =>
   # Allow passing an object
   if typeof month is 'object' and 'month' of month
     {month, year} = month
@@ -431,7 +521,7 @@ $.payment.validateCardExpiry = (month, year) =>
 
   expiry > currentTime
 
-$.payment.validateCardExpiryMonth = (month) =>
+$.validation.validateCardExpiryMonth = (month) =>
 
   return false unless month
 
@@ -454,7 +544,7 @@ $.payment.validateCardExpiryMonth = (month) =>
 
   expiry > currentTime
 
-$.payment.validateCardExpiryYear = (year) =>
+$.validation.validateCardExpiryYear = (year) =>
 
   return false unless year
 
@@ -471,7 +561,7 @@ $.payment.validateCardExpiryYear = (year) =>
   year >= (new Date).getFullYear()
   
 
-$.payment.validateCardCVC = (cvc, type) ->
+$.validation.validateCardCVC = (cvc, type) ->
   cvc = $.trim(cvc)
   return false unless /^\d+$/.test(cvc)
 
@@ -482,11 +572,11 @@ $.payment.validateCardCVC = (cvc, type) ->
     # Check against all types
     cvc.length >= 3 and cvc.length <= 4
 
-$.payment.cardType = (num) ->
+$.validation.cardType = (num) ->
   return null unless num
   cardFromNumber(num)?.type or null
 
-$.payment.formatCardNumber = (num) ->
+$.validation.formatCardNumber = (num) ->
   card = cardFromNumber(num)
   return num unless card
 

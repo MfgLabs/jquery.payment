@@ -2,7 +2,7 @@
 <html>
 <head>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <script src="../lib/jquery.payment.js"></script>
+  <script src="../lib/wdmtg-validation.js"></script>
 
   <style type="text/css" media="screen">
     input.invalid {
@@ -22,21 +22,21 @@
 
   <script>
     jQuery(function($){
-      $('[data-numeric]').payment('restrictNumeric');
-      $('.cc-number').payment('formatCardNumber');
-      $('.cc-exp').payment('formatCardExpiry');
-      $('.cc-cvc').payment('formatCardCVC');
+      $('[data-numeric]').validation('restrictNumeric');
+      $('.cc-number').validation('formatCardNumber');
+      $('.cc-exp').validation('formatCardExpiry');
+      $('.cc-cvc').validation('formatCardCVC');
 
       $('form').submit(function(e){
         e.preventDefault();
         $('input').removeClass('invalid');
         $('.validation').removeClass('passed failed');
 
-        var cardType = $.payment.cardType($('.cc-number').val());
+        var cardType = $.validation.cardType($('.cc-number').val());
 
-        $('.cc-number').toggleClass('invalid', !$.payment.validateCardNumber($('.cc-number').val()));
-        $('.cc-exp').toggleClass('invalid', !$.payment.validateCardExpiry($('.cc-exp').payment('cardExpiryVal')));
-        $('.cc-cvc').toggleClass('invalid', !$.payment.validateCardCVC($('.cc-cvc').val(), cardType));
+        $('.cc-number').toggleClass('invalid', !$.validation.validateCardNumber($('.cc-number').val()));
+        $('.cc-exp').toggleClass('invalid', !$.validation.validateCardExpiry($('.cc-exp').validation('cardExpiryVal')));
+        $('.cc-cvc').toggleClass('invalid', !$.validation.validateCardCVC($('.cc-cvc').val(), cardType));
 
         if ( $('input.invalid').length ) {
           $('.validation').addClass('failed');

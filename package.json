@@ -1,27 +1,26 @@
 {
-  "name": "jquery.payment",
-  "version": "1.0.2-wdmtg2",
-  "description": "jQuery Payment",
-  "main": "lib/jquery.payment.js",
-  "directories": {
-    "example": "example",
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/stripe/jquery.payment.git"
-  },
-  "keywords": [
-    "payment",
-    "cc",
-    "card"
-  ],
-  "author": "Alex MacCaw",
-  "license": "MIT",
-  "dependencies": {
-    "jquery": "latest"
-  }
+    "name": "wdmtg-validation",
+    "version": "0.0.0",
+    "description": "wdmtg-validation",
+    "main": "lib/wdmtg-validation.js",
+    "directories": {
+        "example": "example",
+        "test": "test"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/MfgLabs/wdmtg-validation.git"
+    },
+    "keywords": [
+        "payment",
+        "cc",
+        "card"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "jquery": "latest"
+    }
 }

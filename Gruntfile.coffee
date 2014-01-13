@@ -5,7 +5,7 @@ module.exports = ->
     pkg: @file.readJSON 'package.json'
     coffee:
       compile:
-        files: 'lib/jquery.payment.js': 'src/jquery.payment.coffee'
+        files: 'lib/wdmtg-validation.js': 'src/wdmtg-validation.coffee'
 
     watch:
       coffee:
