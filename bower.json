@@ -1,6 +1,6 @@
 {
     "name": "wdmtg-validation",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "main": "lib/wdmtg-validation.js",
     "dependencies": {
         "jquery": ">=1.5"

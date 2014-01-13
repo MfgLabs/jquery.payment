@@ -1,6 +1,6 @@
 {
     "name": "wdmtg-validation",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "wdmtg-validation",
     "main": "lib/wdmtg-validation.js",
     "directories": {

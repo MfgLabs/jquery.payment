@@ -307,7 +307,6 @@ restrictEmail = (e) ->
   value = $target.val()
   return false if value.length > 254 # http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
 
-restri
 restrictNumeric = (e) ->
   # Key event is for a browser shortcut
   return true if e.metaKey or e.ctrlKey
@@ -390,7 +389,7 @@ setCardType = (e) ->
 
     $target.addClass(cardType)
     $target.toggleClass('identified', cardType isnt 'unknown')
-    $target.trigger('payment.cardType', cardType)
+    $target.trigger('validation.cardType', cardType)
 
 # Public
 
@@ -410,12 +409,12 @@ $.validation.fn.formatEmail = ->
   this
 
 $.validation.fn.formatCardCVC = ->
-  @payment('restrictNumeric')
+  @validation('restrictNumeric')
   @on('keypress', restrictCVC)
   this
 
 $.validation.fn.formatCardExpiry = ->
-  @payment('restrictNumeric')
+  @validation('restrictNumeric')
   @on('keypress', restrictExpiry)
   @on('keypress', formatExpiry)
   @on('keypress', formatForwardSlash)
@@ -424,7 +423,7 @@ $.validation.fn.formatCardExpiry = ->
   this
 
 $.validation.fn.formatCardNumber = ->
-  @payment('restrictNumeric')
+  @validation('restrictNumeric')
   @on('keypress', restrictCardNumber)
   @on('keypress', formatCardNumber)
   @on('keydown', formatBackCardNumber)
@@ -433,12 +432,12 @@ $.validation.fn.formatCardNumber = ->
   this
 
 $.validation.fn.formatExpiryMonth = ->
-  @payment('restrictNumeric')
+  @validation('restrictNumeric')
   @on('keypress', restrictExpiryMonth)
   this
 
 $.validation.fn.formatExpiryYear = ->
-  @payment('restrictNumeric')
+  @validation('restrictNumeric')
   @on('keypress', restrictExpiryYear)
   this
 
