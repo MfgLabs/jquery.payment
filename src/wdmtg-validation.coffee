@@ -408,6 +408,24 @@ $.validation.fn.formatEmail = ->
 
   this
 
+$.validation.fn.restrictSameText = ($other) ->
+
+  @on 'focus', ->
+    $(@).parent().removeClass("error")
+    $other.parent().removeClass("error")
+  
+  @on 'blur', ->
+    if $(@).val() is $other.val()
+      $(@).parent().removeClass("error")
+      $other.parent().removeClass("error")
+    else
+      $(@).parent().addClass("error");
+      if $other.val() is ""
+        $other.parent().addClass("error")
+      else
+        $other.parent().removeClass("error")
+  this
+
 $.validation.fn.formatCardCVC = ->
   @validation('restrictNumeric')
   @on('keypress', restrictCVC)
