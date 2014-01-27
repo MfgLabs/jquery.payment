@@ -608,3 +608,21 @@ $.validation.formatCardNumber = (num) ->
     groups = card.format.exec(num)
     groups?.shift()
     groups?.join(' ')
+
+
+$.validation.checkError = ($elem, $parent, onInput) ->
+  console.log "checkError " + onInput
+  assert = (valid) ->
+    if valid
+      $parent.removeClass('error')
+    else
+      if (onInput) then $parent.addClass('error')
+
+  if $elem.hasClass 'cc-number'
+    assert $.validation.validateCardNumber $elem.val()
+  else if $elem.hasClass('cc-cvc')
+    assert $.validation.validateCardCVC $elem.val(), $.validation.cardType($('.cc-number').val())
+  else if $elem.hasClass('cc-exp-month') or $elem.hasClass('cc-exp-year')
+    assert $.validation.validateCardExpiry $('.cc-exp-month').val(), $('.cc-exp-year').val()
+  else
+    assert $elem.val() isnt "" and $elem.val() isnt "Choose a country.."
